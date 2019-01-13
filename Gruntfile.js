@@ -1,7 +1,7 @@
 'use strict';
 
 var path = require('path');
-var mockApi = require('swagger-mock-api');
+var mockApi = require('./swagger-mock-api');
 
 function corsMiddleware(req, res, next) {
     var hasOrigin = req.headers.origin != null
@@ -27,6 +27,7 @@ module.exports = function (grunt) {
         connect: {
             server: {
                 options: {
+                    port: process.env.GRUNT_PORT || 8000,
                     keepalive: true,
                     middleware: function (connect, options) {
                         var middlewares = [];

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+HOMEDIR="$HOME"/
+get_random_unused_port()
+{
+    local PORT=`gshuf -i 8000-65000 -n 1`
+    if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null ; then
+        get_random_unused_port
+    fi
+
+    echo "$PORT";
+}
+
+add()
+{
+    docker run -d -p "$3:$3" --name "joker-$1" -e GRUNT_PORT=$3 -v "$HOME/zomato/mockers/swagger-api-mock-docker/config/$1.yaml":"/data/swagger.yaml" "mocker-$2":latest
+}
+
+delete()
+{
+    docker rm joker-$1
+}
+
+case "$1" in
+        add)
+            DOCKER_PORT=`get_random_unused_port`
+            add $2 $3 $DOCKER_PORT
+            ;;
+
+        delete)
+            delete $2
+            ;;
+        *)
+            echo $"Usage: $0 {add|delete}"
+            exit 1
+
+esac
+
+exit 0;

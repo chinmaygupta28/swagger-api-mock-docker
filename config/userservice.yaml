@@ -1,0 +1,182 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: Joker
+  termsOfService: http://swagger.io/terms/
+host: petstore.swagger.io
+basePath: /api
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /pets:
+    get:
+      operationId: findPets
+      delay: 5000
+      parameters:
+        - name: tags
+          in: query
+          description: tags to filter by
+          required: false
+          type: array
+          collectionFormat: csv
+          items:
+            type: string
+        - name: limit
+          in: query
+          description: maximum number of results to return
+          required: false
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: pet response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Pet'
+            x-type-options:
+              min: 0
+              max: 10
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      operationId: addPet
+      delay: 5000
+      parameters:
+        - name: pet
+          in: body
+          description: Pet to add to the store
+          required: true
+          schema:
+            $ref: '#/definitions/NewPet'
+      responses:
+        200:
+          description: pet response
+          schema:
+            $ref: '#/definitions/Pet'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /pets/{id}:
+    get:
+      operationId: find pet by id
+      delay: 5000
+      parameters:
+        - name: id
+          in: path
+          description: ID of pet to fetch
+          required: true
+          type: integer
+          format: int64
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/Pet'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      operationId: deletePet
+      delay: 5000
+      parameters:
+        - name: id
+          in: path
+          description: ID of pet to delete
+          required: true
+          type: integer
+          format: int64
+      responses:
+        204:
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Pet:
+    allOf:
+      - $ref: '#/definitions/NewPet'
+      - required:
+        - id
+        properties:
+          id:
+            type: integer
+            format: int64
+            x-type-options:
+              min: 1
+              max: 2
+          # demo of a fixed type value
+          created:
+            type: date
+          status:
+            type: object
+            x-chance-type: fixed
+            x-type-value:
+              type: 'adopted'
+
+  NewPet:
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        x-chance-type: name
+      tag:
+        type: string
+        x-chance-type: guid
+      kingdom:
+        type: string
+        minLength: 3
+        maxLength: 5
+      color:
+        type: string
+        pattern: ^(black|white)ish$
+      age:
+        type: integer
+        multipleOf: 7
+        minimum: 1
+        maximum: 21
+      weight:
+        type: integer
+        minimum: 3
+        exclusiveMinimum: false
+        maximum: 5
+        exclusiveMaximum: true
+      size:
+        type: integer
+        enum:
+          - 1
+          - 2
+          - 3
+      type:
+        type: string
+        enum:
+          - CAT
+          - DOG
+          - TURTLE
+          - RABBIT
+          - TYRANNOSAURUS
+      owner:
+        type: object
+        properties:
+          name:
+            type: string
+            x-chance-type: name
+
+  Error:
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string

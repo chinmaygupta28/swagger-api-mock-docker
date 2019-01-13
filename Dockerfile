@@ -5,6 +5,7 @@ VOLUME /data
 
 ADD Gruntfile.js /mock/Gruntfile.js
 ADD package.json /mock/package.json
+ADD swagger-mock-api/ /mock/swagger-mock-api/
 
 RUN useradd --create-home swagger-mock && \
     chown -R swagger-mock /mock && \
